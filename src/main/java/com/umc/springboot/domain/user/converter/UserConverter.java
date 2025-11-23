@@ -3,7 +3,9 @@ package com.umc.springboot.domain.user.converter;
 import com.umc.springboot.domain.user.dto.request.UserRequest;
 import com.umc.springboot.domain.user.dto.response.UserResponse;
 import com.umc.springboot.domain.user.entity.User;
+import org.springframework.stereotype.Component;
 
+@Component
 public class UserConverter {
 
   public static User toEntity(UserRequest req) {

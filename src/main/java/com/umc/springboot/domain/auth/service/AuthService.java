@@ -136,7 +136,7 @@ public class AuthService {
             .findByEmail(loginRequest.getEmail())
             .orElseThrow(() -> new CustomException(AuthErrorCode.INVALID_PASSWORD));
 
-    if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
+    if (!loginRequest.getPhone().equals(user.getPhone())) {
       throw new CustomException(AuthErrorCode.INVALID_PASSWORD);
     }
 
@@ -154,6 +154,7 @@ public class AuthService {
     setAccessTokenHeader(response, accessToken);
     setRefreshTokenCookie(response, refreshToken, refreshTokenExpireSeconds);
 
+    return userConverter.toResponse(user);
   }
 
   private void setAccessTokenHeader(HttpServletResponse response, String accessToken) {
