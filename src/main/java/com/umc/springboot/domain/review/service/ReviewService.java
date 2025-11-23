@@ -135,4 +135,45 @@ public class ReviewService {
 
     return new PageImpl<>(content, pageable, page.getTotalElements());
   }
+
+  /**
+   * 가게별 리뷰 목록 페이징 조회
+   */
+  public Page<ReviewResponse> getReviewsByStore(Long storeId, Pageable pageable) {
+
+    // 가게 존재 여부 검증
+    Store store = storeRepository.findById(storeId)
+        .orElseThrow(() -> new CustomException(GlobalErrorCode.RESOURCE_NOT_FOUND));
+
+    // 해당 가게의 리뷰 페이지 조회
+    Page<Review> page = reviewRepository.findByStoreId(store.getId(), pageable);
+
+    // 리뷰 ID 목록 추출
+    List<Long> reviewIds = page.getContent().stream()
+        .map(Review::getId)
+        .toList();
+
+    Map<Long, List<String>> imagesByReviewId = Collections.emptyMap();
+
+    if (!reviewIds.isEmpty()) {
+      List<ReviewImage> allImages = reviewImageRepository.findByReviewIdIn(reviewIds);
+
+      imagesByReviewId = allImages.stream()
+          .collect(Collectors.groupingBy(
+              img -> img.getReview().getId(),
+              Collectors.mapping(ReviewImage::getImageUrl, Collectors.toList())
+          ));
+    }
+
+    Map<Long, List<String>> finalImagesMap = imagesByReviewId;
+
+    List<ReviewResponse> content = page.getContent().stream()
+        .map(r -> ReviewConverter.toResponse(
+            r,
+            finalImagesMap.getOrDefault(r.getId(), List.of())
+        ))
+        .toList();
+
+    return new PageImpl<>(content, pageable, page.getTotalElements());
+  }
 }
