@@ -2,16 +2,14 @@ package com.umc.springboot.domain.review.controller;
 
 import com.umc.springboot.domain.review.dto.request.ReviewCreateRequest;
 import com.umc.springboot.domain.review.dto.request.ReviewRequest;
+import com.umc.springboot.domain.review.dto.response.PageableResponse;
 import com.umc.springboot.domain.review.dto.response.ReviewResponse;
 import com.umc.springboot.domain.review.service.ReviewService;
-import com.umc.springboot.global.dto.PageableResponse;
 import com.umc.springboot.global.response.BaseResponse;
 import com.umc.springboot.global.security.SecurityUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -69,8 +67,7 @@ public class ReviewController {
   )
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<BaseResponse<PageableResponse<ReviewResponse>>> getMyReviewsPaged(
-      @RequestParam(required = false) String storeName,
-      @RequestParam(required = false) @Min(1) @Max(5) Integer ratingBand,
+      @RequestParam(required = false) Long storeId,
       @RequestParam(name = "page", defaultValue = "1") Integer page
   ) {
     Long userId = SecurityUtil.getCurrentUserId();
@@ -84,8 +81,7 @@ public class ReviewController {
     );
 
     ReviewRequest filter = ReviewRequest.builder()
-        .storeName(storeName)
-        .ratingBand(ratingBand)
+        .storeId(storeId)
         .build();
 
     Page<ReviewResponse> result = reviewService.getReviewsByUser(userId, filter, pageable);
@@ -96,6 +92,7 @@ public class ReviewController {
         BaseResponse.success("내 리뷰 페이징 조회에 성공했습니다.", body)
     );
   }
+
 
   /**
    * 가게 리뷰 페이징 조회

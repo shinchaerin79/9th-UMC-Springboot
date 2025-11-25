@@ -1,4 +1,4 @@
-package com.umc.springboot.global.dto;
+package com.umc.springboot.domain.review.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;

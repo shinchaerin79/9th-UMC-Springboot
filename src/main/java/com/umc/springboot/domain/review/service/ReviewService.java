@@ -94,19 +94,12 @@ public class ReviewService {
   }
 
   /**
-   * 내 리뷰 목록 조회 (기존 코드 유지)
+   * 내 리뷰 목록 조회
    */
-  public Page<ReviewResponse> getReviewsByUser(Long userId, ReviewRequest filter,
-      Pageable pageable) {
+  public Page<ReviewResponse> getReviewsByUser(Long userId,
+      ReviewRequest filter, Pageable pageable) {
 
-    // ratingBand 검증
-    if (filter.getRatingBand() != null) {
-      int band = filter.getRatingBand();
-      if (band < 1 || band > 5) {
-        throw new CustomException(GlobalErrorCode.INVALID_INPUT_VALUE);
-      }
-    }
-
+    // 필터 검증 로직은 필요 없고, 그대로 QueryRepository에 넘김
     Page<Review> page = reviewRepository.findMyReviews(userId, filter, pageable);
 
     // 이하 기존 코드 그대로
@@ -135,6 +128,7 @@ public class ReviewService {
 
     return new PageImpl<>(content, pageable, page.getTotalElements());
   }
+
 
   /**
    * 가게별 리뷰 목록 페이징 조회
